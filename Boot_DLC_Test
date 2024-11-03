@@ -14,7 +14,7 @@ class Player:
         self.athletics = 10
         self.bmi = 25
 
-    def update_status(self, health_change, stamina_change, morale_change):
+    def update_status(self, health_change=0, stamina_change=0, morale_change=0):
         self.health += health_change
         self.stamina += stamina_change
         self.morale += morale_change
@@ -46,13 +46,13 @@ class Event:
             sub_event = random.choice(result['sub_events'])
             print(sub_event['text'])
             if sub_event['type'] == 'stat_check':
-                if random.randint(1, 20) + player.strength >= sub_event['difficulty']:
+                stat_value = getattr(player, sub_event['stat'], 0)
+                if random.randint(1, 20) + stat_value >= sub_event['difficulty']:
                     print("You succeeded the check!")
-                    player.update_status(sub_event['health_change'], sub_event['stamina_change'], sub_event['morale_change'])
+                    player.update_status(sub_event.get('health_change', 0), sub_event.get('stamina_change', 0), sub_event.get('morale_change', 0))
                 else:
                     print("You failed the check.")
-                    player.update_status(sub_event['health_change_fail'], sub_event['stamina_change_fail'], sub_event['morale_change_fail'])
-            # Handle other types of sub-events
+                    player.update_status(sub_event.get('health_change_fail', 0), sub_event.get('stamina_change_fail', 0), sub_event.get('morale_change_fail', 0))
         return result
 
 class BootCampGame:
@@ -65,9 +65,9 @@ class BootCampGame:
         return [
             Event("You wake up at dawn. What do you do?",
                   [{"text": "Run 5 miles", "health_change": -10, "stamina_change": -20, "morale_change": -5, 
-                    "sub_events": [{"text": "Roll for stamina check", "type": "stat_check", "difficulty": 15, "health_change": 0, "stamina_change": -5, "morale_change": 5, "health_change_fail": -5, "stamina_change_fail": -10, "morale_change_fail": -5}]},
+                    "sub_events": [{"text": "Roll for stamina check", "type": "stat_check", "stat": "stamina", "difficulty": 15, "health_change": 0, "stamina_change": -5, "morale_change": 5, "health_change_fail": -5, "stamina_change_fail": -10, "morale_change_fail": -5}]},
                    {"text": "Eat breakfast", "health_change": 5, "stamina_change": 10, "morale_change": 5, 
-                    "sub_events": [{"text": "Eat more food", "type": "stat_check", "difficulty": 10, "health_change": 5, "stamina_change": 10, "morale_change": 5, "health_change_fail": 0, "stamina_change_fail": 0, "morale_change_fail": -5}]}]),
+                    "sub_events": [{"text": "Eat more food", "type": "stat_check", "stat": "strength", "difficulty": 10, "health_change": 5, "stamina_change": 10, "morale_change": 5, "health_change_fail": 0, "stamina_change_fail": 0, "morale_change_fail": -5}]}]),
             # Add more events here
         ]
 
@@ -88,4 +88,3 @@ class BootCampGame:
 # Start the game
 game = BootCampGame()
 game.start()
-
