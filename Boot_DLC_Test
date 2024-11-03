@@ -1,0 +1,91 @@
+import random
+
+class Player:
+    def __init__(self):
+        self.health = 100
+        self.stamina = 100
+        self.morale = 100
+        self.strength = 10
+        self.dexterity = 10
+        self.constitution = 10
+        self.intelligence = 10
+        self.wisdom = 10
+        self.charisma = 10
+        self.athletics = 10
+        self.bmi = 25
+
+    def update_status(self, health_change, stamina_change, morale_change):
+        self.health += health_change
+        self.stamina += stamina_change
+        self.morale += morale_change
+        self.check_game_over()
+
+    def update_bmi(self, bmi_change):
+        self.bmi += bmi_change
+
+    def check_game_over(self):
+        if self.health <= 0 or self.stamina <= 0 or self.morale <= 0:
+            print("Game Over! You didn't make it through boot camp.")
+            exit()
+
+    def display_status(self):
+        print(f"Health: {self.health}, Stamina: {self.stamina}, Morale: {self.morale}, BMI: {self.bmi}")
+
+class Event:
+    def __init__(self, description, choices):
+        self.description = description
+        self.choices = choices
+
+    def present_event(self, player):
+        print(self.description)
+        for i, choice in enumerate(self.choices):
+            print(f"{i + 1}. {choice['text']}")
+        selected_choice = int(input("Choose an option: ")) - 1
+        result = self.choices[selected_choice]
+        if 'sub_events' in result:
+            sub_event = random.choice(result['sub_events'])
+            print(sub_event['text'])
+            if sub_event['type'] == 'stat_check':
+                if random.randint(1, 20) + player.strength >= sub_event['difficulty']:
+                    print("You succeeded the check!")
+                    player.update_status(sub_event['health_change'], sub_event['stamina_change'], sub_event['morale_change'])
+                else:
+                    print("You failed the check.")
+                    player.update_status(sub_event['health_change_fail'], sub_event['stamina_change_fail'], sub_event['morale_change_fail'])
+            # Handle other types of sub-events
+        return result
+
+class BootCampGame:
+    def __init__(self):
+        self.player = Player()
+        self.days = 90
+        self.events = self.generate_events()
+
+    def generate_events(self):
+        return [
+            Event("You wake up at dawn. What do you do?",
+                  [{"text": "Run 5 miles", "health_change": -10, "stamina_change": -20, "morale_change": -5, 
+                    "sub_events": [{"text": "Roll for stamina check", "type": "stat_check", "difficulty": 15, "health_change": 0, "stamina_change": -5, "morale_change": 5, "health_change_fail": -5, "stamina_change_fail": -10, "morale_change_fail": -5}]},
+                   {"text": "Eat breakfast", "health_change": 5, "stamina_change": 10, "morale_change": 5, 
+                    "sub_events": [{"text": "Eat more food", "type": "stat_check", "difficulty": 10, "health_change": 5, "stamina_change": 10, "morale_change": 5, "health_change_fail": 0, "stamina_change_fail": 0, "morale_change_fail": -5}]}]),
+            # Add more events here
+        ]
+
+    def start(self):
+        print("Welcome to Boot Camp!")
+        for day in range(1, self.days + 1):
+            print(f"Day {day}:")
+            self.run_day()
+            if day == self.days:
+                print("Congratulations! You made it through boot camp.")
+
+    def run_day(self):
+        for _ in range(12):
+            event = random.choice(self.events)
+            event.present_event(self.player)
+            self.player.display_status()
+
+# Start the game
+game = BootCampGame()
+game.start()
+
