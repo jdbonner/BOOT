@@ -63,12 +63,13 @@ class BootCampGame:
 
     def generate_events(self):
         return [
-            Event("You wake up at dawn. What do you do?",
+            Event("LIGHTS LIGHTS LIGHTS! LIGHTS LIGHTS LIGHTS!",
                   [{"text": "Run 5 miles", "health_change": -10, "stamina_change": -20, "morale_change": -5, 
                     "sub_events": [{"text": "Roll for stamina check", "type": "stat_check", "stat": "stamina", "difficulty": 15, "health_change": 0, "stamina_change": -5, "morale_change": 5, "health_change_fail": -5, "stamina_change_fail": -10, "morale_change_fail": -5}]},
                    {"text": "Eat breakfast", "health_change": 5, "stamina_change": 10, "morale_change": 5, 
                     "sub_events": [{"text": "Eat more food", "type": "stat_check", "stat": "strength", "difficulty": 10, "health_change": 5, "stamina_change": 10, "morale_change": 5, "health_change_fail": 0, "stamina_change_fail": 0, "morale_change_fail": -5}]}]),
             # Add more events here
+            
         ]
 
     def start(self):
